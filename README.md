@@ -1,2 +1,2 @@
-# Projeto_Modelagem_de_Sistemas-Cozinha_de_Republica
-Repositório criado para projeto da matéria de Modelagem de Sistemas.
+# Projeto Modelagem de Sistemas - Cozinha de Republica
+Repositório criado para projeto da disciplina de Modelagem de Sistemas.
