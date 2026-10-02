@@ -27,7 +27,7 @@
 
 * **RNF-01 (Desempenho/Desempenho em Consultas)**
 * **Padrão EARS**: Ubiquitous
-* **Especificação**: **THE SYSTEM SHALL** responder às consultas de estoque e saldo financeiro em tempo inferior a 1,5 segundos (P95) para requisições sob carga normal.
+* **Especificação**: **THE SYSTEM SHALL** responder às consultas de estoque e saldo financeiro em tempo inferior a 1,5 segundos para requisições sob carga normal.
 * **RNF-02 (Segurança e Proteção de Credenciais)**
 * **Padrão EARS**: Ubiquitous
 * **Especificação**: **THE SYSTEM SHALL** armazenar as senhas dos usuários utilizando o algoritmo de hashing *bcrypt* com *salt* e exigir autenticação via token JWT para todas as requisições privadas da API.
