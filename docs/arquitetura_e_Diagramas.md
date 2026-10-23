@@ -1,5 +1,5 @@
 # Arquitetura do Sistema: Cozinha de República (CoChef)
-<!-- File: docs/arquitetura.md -->
+<!-- File: docs/arquitetura_e_Diagramas.md -->
 <!-- Mantido por: Tech Lead + Equipe de Arquitetura -->
 <!-- Status: Ativo / Em conformidade com constitution.md -->
 
