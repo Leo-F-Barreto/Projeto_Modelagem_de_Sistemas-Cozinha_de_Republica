@@ -58,28 +58,34 @@ Para garantir um desenvolvimento pragmático, testável e focado na entrega de v
 
 ---
 
-## Execução local e checkpoint
+## Execução local
+
+O sistema roda em **Python 3.12+** (FastAPI + SQLAlchemy). O código fica em `python/` e a interface HTML em `public/`, servida pela própria aplicação em `/`. Detalhes de arquitetura, testes e mudanças em relação à versão TypeScript estão em [python/README.md](python/README.md) e [python/MUDANCAS.md](python/MUDANCAS.md).
 
 ### Requisitos
 
-- Node.js **22.6 ou superior** (usa o suporte experimental do Node para executar TypeScript sem etapa de compilação).
-- Não há dependências npm de terceiros obrigatórias no checkpoint atual.
+- Python 3.12 ou superior.
+- PostgreSQL 16 é opcional: sem ele, o sistema usa SQLite em `python/dados/cochef.db`.
 
-### Comandos
+### Comandos 
 
 ```bash
-npm test             # suíte estável de testes automatizados
-npm run test:red     # testes TDD da funcionalidade de lotes ainda não implementada
-npm start            # API e protótipo web em http://localhost:3000
+python -m venv .venv
+.venv/bin/pip install -e ".[dev]"        # Windows: .venv\Scripts\pip install -e ".[dev]"
+.venv/bin/python -m app.main             # API e interface em http://localhost:3000
+.venv/bin/pytest                         # suíte estável de testes automatizados
+.venv/bin/pytest tests/demonstracao/defeito_rateio_demo.py   # exemplo de falha: 2 falham de propósito, 1 passa
 ```
 
-A configuração pode ser ajustada com variáveis de ambiente: `PORT` (porta HTTP), `COCHEF_DB` (arquivo SQLite), `COCHEF_JWT_SEGREDO` (segredo JWT com no mínimo 32 caracteres) e `COCHEF_FUSO` (fuso horário). O banco e o segredo local não devem ser versionados.
+No Windows, troque `.venv/bin/` por `.venv\Scripts\`.
 
-### Protótipo HTML
+A configuração é feita por variáveis de ambiente ou por um arquivo `python/.env` (modelo em [python/.env.example](python/.env.example)): `PORT` (porta HTTP), `COCHEF_DB_URL` (SQLite ou PostgreSQL), `COCHEF_JWT_SEGREDO` (segredo do token, com no mínimo 32 caracteres) e `COCHEF_FUSO` (fuso horário). O banco e o segredo local não devem ser versionados.
 
-O protótipo está em `public/index.html`, com estilos em `public/styles.css` e interações em `public/app.js`, e é servido pela aplicação em `/`. Ele demonstra os módulos de visão geral, estoque, lista de compras, financeiro, escala e moradores. As interações usam dados fictícios e `localStorage` do navegador; elas **não** substituem a API, a autenticação real, nem pagamentos. Para restaurar os dados fictícios iniciais, remova a chave `cochef-demo-v1` do armazenamento local do navegador.
+### Interface HTML
+
+A interface está em `public/index.html`, com estilos em `public/styles.css` e interações em `public/app.js`. Ela usa a API de verdade: tem tela de login e cadastro, e os dados ficam no banco. A versão de demonstração antiga, com dados fictícios no navegador, está guardada em `docs/prototipo-original/`.
 
 ### Estado conhecido dos testes
 
-- `npm test`: suíte estável; a evidência desta rodada está em `docs/review/checkpoint-2026-10-22.md`.
-- `npm run test:red`: espera falhar por enquanto. O grupo T-46 especifica consumo por lotes/FEFO, mas a regra e a integração com a API ainda precisam ser implementadas. Não confundir a fase vermelha de TDD com a suíte estável.
+- `pytest`: suíte estável (122 testes), passa no SQLite e no PostgreSQL. Inclui os testes de lotes (T-46), que eram a fase vermelha na versão TypeScript e agora passam.
+- `tests/demonstracao/defeito_rateio_demo.py`: falha de propósito, como exemplo de como um defeito no rateio é apontado pelos testes. Fica fora da suíte estável.

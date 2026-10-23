@@ -1,0 +1,49 @@
+[project]
+name = "cochef"
+version = "2.0.0"
+description = "CoChef: gestão colaborativa de estoque, compras, rateio financeiro e escala de uma república."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "pyjwt>=2.8",
+  "bcrypt>=4.1",
+  "apscheduler>=3.10,<4",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5", "mypy>=1.10"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+"app.db.migracoes" = ["script.py.mako"]
+
+[project.scripts]
+cochef = "app.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008", "E501"]  # o formatador cuida do tamanho das linhas de código; textos longos ficam inteiros
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

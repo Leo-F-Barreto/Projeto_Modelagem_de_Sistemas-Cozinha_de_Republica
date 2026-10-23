@@ -3,3 +3,31 @@
     @media(max-width:1150px){.app{grid-template-columns:215px minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid,.section-grid{grid-template-columns:minmax(0,1fr)}.people-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.date-chip{display:none}}
     @media(max-width:760px){.app{display:block}.sidebar{position:sticky;height:auto;padding:10px 12px;top:0}.brand{padding:0 5px 9px}.brand-mark{width:34px;height:34px;border-radius:11px;font-size:18px}.brand-name{font-size:17px}.brand-sub{font-size:8px}.nav-label,.house-card,.profile{display:none}.nav{display:flex;gap:5px;overflow-x:auto;padding-bottom:1px}.nav button{padding:9px 10px;white-space:nowrap;gap:7px;font-size:11px}.nav-icon{font-size:14px}.nav .nav-count{padding:1px 5px}.sidebar-spacer{display:none}.main{padding:21px 14px 32px}.topbar{margin-bottom:22px}.page-title{font-size:27px}.top-actions{gap:6px}.demo-chip{font-size:10px;padding:7px 9px}.welcome{align-items:flex-start}.welcome h2{font-size:20px}.welcome p{font-size:12px}.welcome .btn{font-size:10px;padding:10px}.stats{gap:9px}.stat{padding:14px}.stat-value{font-size:25px}.stat-top{font-size:10px}.stat-icon{width:29px;height:29px}.stat-note{font-size:10px}.panel-head{padding:17px 15px 12px}.alert-list,.task-list,.low-stock,.balance-list,.notices{padding-left:15px;padding-right:15px}.stock-line{grid-template-columns:minmax(0,1fr) 60px;gap:8px}.stock-line>.small-muted{display:none}.module-head{align-items:flex-start;flex-direction:column;gap:13px}.module-head h2{font-size:23px}.toolbar{align-items:stretch}.search{max-width:none}.toolbar .select{flex:1}.table-wrap{border-radius:13px}.finance-hero{padding:19px}.finance-hero .total{font-size:29px}.people-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.schedule-grid{padding-left:14px;padding-right:14px}.date-chip{display:none}.top-actions .icon-button{width:35px;height:35px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+    /* --- Acesso (login e cadastro) --- */
+    [hidden]{display:none!important}
+    .auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:linear-gradient(160deg,var(--forest) 0%,var(--forest-2) 100%)}
+    .auth-card{width:100%;max-width:420px;background:var(--paper);border-radius:var(--radius);box-shadow:0 18px 50px rgba(0,0,0,.18);padding:26px 24px}
+    .auth-brand{padding:0 0 18px;color:var(--forest)}
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--cream);border-radius:12px;padding:4px;margin-bottom:18px}
+    .auth-tabs button{border:0;background:transparent;border-radius:9px;padding:9px;font-weight:700;color:var(--muted)}
+    .auth-tabs button.active{background:var(--paper);color:var(--forest);box-shadow:var(--shadow)}
+    .auth-form{display:grid;gap:13px}
+    .auth-choice{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;margin:0}
+    .auth-choice legend{font-weight:700;font-size:12px;padding:0 4px}
+    .auth-choice label{display:flex;gap:8px;align-items:center;font-size:13px}
+    .auth-submit{width:100%;justify-content:center;margin-top:4px}
+    .auth-error{color:var(--red);min-height:1.5em;margin:12px 0 0;font-size:12px}
+    .logout{margin-left:auto;border:0;background:#ffffff14;color:#fff;border-radius:10px;width:32px;height:32px}
+    .logout:hover{background:#ffffff26}
+
+    /* --- Elementos ligados à API --- */
+    .invite-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:20px;font-weight:800;letter-spacing:2px;color:var(--forest)}
+    .notification-list{max-height:55vh;overflow:auto;display:grid;gap:8px;margin-top:6px}
+    .notification{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px}
+    .notification.unread{border-color:#b9d4c1;background:var(--green-bg)}
+    .notification .when{color:var(--muted);font-size:11px;margin-top:3px}
+    .row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .person-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+    .lot-list{color:var(--muted);font-size:11px;margin-top:2px}
+    body:not(.is-admin) .admin-only{display:none!important}
