@@ -67,7 +67,7 @@ O sistema roda em **Python 3.12+** (FastAPI + SQLAlchemy). O código fica em `py
 - Python 3.12 ou superior.
 - PostgreSQL 16 é opcional: sem ele, o sistema usa SQLite em `python/dados/cochef.db`.
 
-### Comandos 
+### Comandos (dentro de `python/`)
 
 ```bash
 python -m venv .venv

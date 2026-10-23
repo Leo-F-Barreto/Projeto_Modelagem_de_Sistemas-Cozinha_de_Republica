@@ -8,6 +8,8 @@
   <title>CoChef — Cozinha em harmonia</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/styles.css">
+  <!-- Mesmo arquivo pelo caminho relativo: faz a página funcionar também aberta direto do disco (file://). -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <main class="auth" id="auth-screen" hidden>
@@ -32,6 +34,7 @@
       <button type="submit" class="btn btn-primary auth-submit">Criar conta</button>
     </form>
     <p class="auth-error" id="auth-error" role="alert"></p>
+    <p class="preview-hint" id="preview-hint" hidden>Modo demonstração: entre com qualquer e-mail e senha.</p>
   </div>
 </main>
 <div class="app" id="app" hidden>
@@ -51,15 +54,15 @@
     <div class="profile"><div class="avatar" id="profile-avatar"></div><div><div class="profile-name" id="profile-name"></div><div class="profile-role" id="profile-role"></div></div><button class="logout" id="logout-button" title="Sair" aria-label="Sair">⎋</button></div>
   </aside>
   <main class="main">
-    <header class="topbar"><div><div class="eyebrow" id="page-eyebrow">QUINTA-FEIRA, CASA ORGANIZADA</div><h1 class="page-title" id="page-title">Visão geral</h1></div><div class="top-actions"><span class="demo-chip" id="today-chip"></span><button class="icon-button" id="notifications-button" aria-label="Ver notificações" title="Notificações">♧<span class="dot" id="notifications-dot" hidden></span></button></div></header>
+    <header class="topbar"><div><div class="eyebrow" id="page-eyebrow">QUINTA-FEIRA, CASA ORGANIZADA</div><h1 class="page-title" id="page-title">Visão geral</h1></div><div class="top-actions"><div class="preview-menu" id="preview-bar" hidden><button type="button" class="demo-chip preview-chip" id="preview-toggle" aria-expanded="false" aria-controls="preview-panel"><span class="live-dot" aria-hidden="true"></span>Protótipo interativo</button><div class="preview-panel" id="preview-panel" hidden><div class="preview-panel-title">Modo demonstração</div><p>Dados fictícios guardados só nesta aba. Nada vai para o servidor.</p><label class="preview-field" for="preview-user">Ver a casa como</label><select id="preview-user" class="select"></select><button type="button" class="btn btn-light btn-small" id="preview-reset">Recomeçar com dados de exemplo</button></div></div><span class="demo-chip" id="today-chip"></span><button class="icon-button" id="notifications-button" aria-label="Ver notificações" title="Notificações">♧<span class="dot" id="notifications-dot" hidden></span></button></div></header>
 
     <section class="view active" id="view-dashboard" aria-labelledby="page-title">
       <div class="welcome"><div><h2>Bom te ver por aqui, <span id="welcome-name"></span> <span aria-hidden="true">🌿</span></h2><p>Uma cozinha em harmonia começa com pequenas combinações.</p></div><button class="btn btn-primary" data-open-modal="item-modal">＋ Novo item</button></div>
       <div class="stats">
-        <article class="stat"><div class="stat-top"><span>Itens ativos no estoque</span><span class="stat-icon">▤</span></div><div class="stat-value" id="stat-stock">0</div><div class="stat-note"><span class="positive">●</span> Somente itens disponíveis</div></article>
-        <article class="stat"><div class="stat-top"><span>Precisam de atenção</span><span class="stat-icon">◉</span></div><div class="stat-value" id="stat-expiry">0</div><div class="stat-note">Validade crítica em até 72h</div></article>
-        <article class="stat"><div class="stat-top"><span>Na lista de compras</span><span class="stat-icon">🛒</span></div><div class="stat-value" id="stat-shopping">0</div><div class="stat-note">Itens pendentes de reposição</div></article>
-        <article class="stat"><div class="stat-top"><span>Meu saldo</span><span class="stat-icon">◌</span></div><div class="stat-value" id="stat-balance">R$ 0</div><div class="stat-note">Positivo recebe · negativo paga</div></article>
+        <article class="stat stat-link" role="button" tabindex="0" data-go-view="stock" data-go-filter="TODOS"><div class="stat-top"><span>Itens ativos no estoque</span><span class="stat-icon">▤</span></div><div class="stat-value" id="stat-stock">0</div><div class="stat-note"><span class="positive">●</span> Somente itens disponíveis</div></article>
+        <article class="stat stat-link" role="button" tabindex="0" data-go-view="stock" data-go-filter="ATENCAO"><div class="stat-top"><span>Precisam de atenção</span><span class="stat-icon">◉</span></div><div class="stat-value" id="stat-expiry">0</div><div class="stat-note">Validade crítica em até 72h</div></article>
+        <article class="stat stat-link" role="button" tabindex="0" data-go-view="shopping"><div class="stat-top"><span>Na lista de compras</span><span class="stat-icon">🛒</span></div><div class="stat-value" id="stat-shopping">0</div><div class="stat-note">Itens pendentes de reposição</div></article>
+        <article class="stat stat-link" role="button" tabindex="0" data-go-view="finance"><div class="stat-top"><span>Meu saldo</span><span class="stat-icon">◌</span></div><div class="stat-value" id="stat-balance">R$ 0</div><div class="stat-note">Positivo recebe · negativo paga</div></article>
       </div>
       <div class="dashboard-grid">
         <article class="panel"><div class="panel-head"><div><h2 class="panel-title">Atenção na validade</h2><div class="panel-subtitle">Itens que merecem ser consumidos primeiro</div></div><button class="text-link" data-go-view="stock">Ver estoque ↗</button></div><div class="alert-list" id="dashboard-alerts"></div></article>
@@ -101,7 +104,7 @@
       <div class="module-head"><div><div class="eyebrow">A CASA É DE TODO MUNDO</div><h2 id="page-title-people">Moradores</h2><p>Perfis, responsabilidades e status dos participantes.</p></div></div>
       <div class="panel admin-only" id="invite-panel" style="margin-bottom:18px"><div class="panel-head"><div><h2 class="panel-title">Convidar moradores</h2><div class="panel-subtitle">Compartilhe o código; quem entrar por ele vira morador desta casa.</div></div><button class="btn btn-light btn-small" id="invite-regenerate">Gerar novo código</button></div><div class="notices"><div class="invite-code" id="invite-code"></div></div></div><div class="people-grid" id="people-grid"></div><div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2 class="panel-title">Papéis e permissões</h2><div class="panel-subtitle">Resumo do que cada perfil pode fazer</div></div></div><div class="notices"><div class="notice-row"><span class="pill neutral">Morador</span><span>Gerencia seus itens individuais, consome itens coletivos, participa da lista e conclui suas tarefas.</span></div><div class="notice-row"><span class="pill ok">Administrador</span><span>Além das ações comuns, gerencia a república, aprova despesas e fecha balanços.</span></div></div></div>
     </section>
-    <div class="footer-note">CoChef · Os dados ficam no servidor da república e só os moradores autenticados os veem</div>
+    <div class="footer-note" id="footer-note">CoChef · Os dados ficam no servidor da república e só os moradores autenticados os veem</div>
   </main>
 </div>
 
@@ -114,6 +117,10 @@
 
 <div class="modal-backdrop" id="notifications-modal" role="dialog" aria-modal="true" aria-labelledby="notifications-title"><div class="modal"><div class="modal-top"><div><h3 id="notifications-title">Notificações</h3><p>Avisos de validade, estoque, compras, acertos e escala.</p></div><button class="close-button" data-close-modal aria-label="Fechar">×</button></div><div class="notification-list" id="notifications-list"></div><div class="form-footer"><button type="button" class="btn btn-outline" id="notifications-read-all">Marcar todas como lidas</button></div></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/preview.js" defer></script>
 <script src="/app.js" defer></script>
+<!-- Cópias relativas para abrir a página direto do disco; os próprios scripts ignoram a segunda carga. -->
+<script src="preview.js" defer></script>
+<script src="app.js" defer></script>
 </body>
 </html>

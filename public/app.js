@@ -1,6 +1,10 @@
 // CoChef: interface ligada à API (/api). Todo dado vem do servidor; o navegador guarda só o token da sessão.
+// Sem servidor (arquivo aberto direto no navegador) ou com ?preview na URL, a página entra no modo
+// demonstração de preview.js, que responde no mesmo formato da API com dados de exemplo em memória.
 (() => {
   'use strict';
+  if (window.__cochefIniciado) return; // o script pode ser incluído duas vezes (caminho absoluto e relativo)
+  window.__cochefIniciado = true;
 
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -38,13 +42,15 @@
   // ---------------------------------------------------------------- sessão e chamadas à API
   let sessao = null;
   try { sessao = JSON.parse(localStorage.getItem(CHAVE_SESSAO) || 'null'); } catch { sessao = null; }
-  const salvarSessao = (s) => { sessao = s; try { s ? localStorage.setItem(CHAVE_SESSAO, JSON.stringify(s)) : localStorage.removeItem(CHAVE_SESSAO); } catch { /* sem armazenamento */ } };
+  let modoPreview = false;
+  const salvarSessao = (s) => { sessao = s; if (modoPreview) return; try { s ? localStorage.setItem(CHAVE_SESSAO, JSON.stringify(s)) : localStorage.removeItem(CHAVE_SESSAO); } catch { /* sem armazenamento */ } };
 
   class ErroApi extends Error {
     constructor(status, codigo, mensagem) { super(mensagem); this.status = status; this.codigo = codigo; }
   }
 
   async function api(metodo, caminho, corpo) {
+    if (modoPreview) return window.CoChefPreview.api(metodo, caminho, corpo);
     const headers = { Accept: 'application/json' };
     if (corpo !== undefined) headers['Content-Type'] = 'application/json';
     if (sessao?.token) headers.Authorization = `Bearer ${sessao.token}`;
@@ -121,10 +127,14 @@
     shopping: ['TODO MUNDO PARTICIPA', 'Lista de compras'], finance: ['TRANSPARÊNCIA SEM ATRITO', 'Financeiro da república'],
     schedule: ['DIVIDINDO A ROTINA', 'Escala da casa'], people: ['A CASA É DE TODO MUNDO', 'Moradores'],
   };
-  function useView(name) {
+  function useView(name, { historico = true } = {}) {
+    if (!ROTULOS[name]) name = 'dashboard';
+    if (historico && location.hash.slice(1) !== name) { try { history.pushState(null, '', `#${name}`); } catch { /* file:// em alguns navegadores */ } }
     $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${name}`));
     $$('#navigation button').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
-    $('#page-eyebrow').textContent = ROTULOS[name][0];
+    const hoje = estado.painel?.hoje;
+    const diaSemana = hoje ? new Date(`${hoje}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long' }).toUpperCase() : '';
+    $('#page-eyebrow').textContent = diaSemana ? `${diaSemana}, ${ROTULOS[name][0]}` : ROTULOS[name][0];
     $('#page-title').textContent = ROTULOS[name][1];
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -159,7 +169,7 @@
     document.body.classList.toggle('is-admin', ehAdmin());
     const membrosAtivos = republica.membros.filter((m) => m.ativo);
     $('#house-name').textContent = republica.nome;
-    $('#house-meta').textContent = `${membrosAtivos.length} morador(es) ativo(s)`;
+    $('#house-meta').textContent = `${membrosAtivos.length} ${membrosAtivos.length === 1 ? 'morador ativo' : 'moradores ativos'}`;
     $('#house-people').innerHTML = membrosAtivos.slice(0, 6).map((m) => `<span class="person-dot" title="${escapeHtml(m.nome)}">${escapeHtml(iniciais(m.nome))}</span>`).join('');
     $('#profile-avatar').textContent = iniciais(eu.nome);
     $('#profile-name').textContent = eu.nome;
@@ -169,6 +179,9 @@
     $('#today-chip').textContent = hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
     $('#notifications-dot').hidden = !painel.notificacoesNaoLidas;
     $('#notifications-button').setAttribute('aria-label', `Ver notificações (${painel.notificacoesNaoLidas} não lidas)`);
+    if (modoPreview) {
+      $('#preview-user').innerHTML = window.CoChefPreview.membros().map((m) => `<option value="${m.id}" ${m.id === eu.id ? 'selected' : ''}>${escapeHtml(m.nome)}${m.perfil === 'ADMIN' ? ' (admin)' : ''}</option>`).join('');
+    }
   }
 
   function renderStats() {
@@ -269,7 +282,7 @@
     const atraso = t.atrasado ? ' · <span class="negative">atrasado</span>' : '';
     const check = `<input class="check" type="checkbox" data-task-check="${t.id}" ${t.status === 'CONCLUIDO' ? 'checked disabled' : ''} ${podeConcluir ? '' : 'disabled'} aria-label="Concluir ${escapeHtml(ROTULO_TURNO[t.tipo])} de ${escapeHtml(quando)}">`;
     const troca = !compacto && meu && t.status === 'PENDENTE' && t.data > hoje ? `<button class="text-link" data-swap="${t.id}">Pedir troca</button>` : '';
-    return `<div class="task ${t.status === 'CONCLUIDO' ? 'done' : ''}">${check}<div class="task-copy"><div class="task-name">${escapeHtml(ROTULO_TURNO[t.tipo])}</div><div class="task-meta">${quando} · ${escapeHtml(t.responsavelNome)}${atraso}</div></div><span class="task-owner">${escapeHtml(ROTULO_TURNO[t.tipo])}</span>${troca}</div>`;
+    return `<div class="task ${t.status === 'CONCLUIDO' ? 'done' : ''}">${check}<div class="task-copy"><div class="task-name">${escapeHtml(t.descricao || ROTULO_TURNO[t.tipo])}</div><div class="task-meta">${quando} · ${escapeHtml(t.responsavelNome)}${atraso}</div></div><span class="task-owner">${escapeHtml(ROTULO_TURNO[t.tipo])}</span>${troca}</div>`;
   }
 
   function renderSchedule() {
@@ -390,7 +403,10 @@
   document.addEventListener('click', (e) => {
     const alvo = (sel) => e.target.closest(sel);
     let el;
-    if ((el = alvo('[data-go-view]'))) useView(el.dataset.goView);
+    if ((el = alvo('[data-go-view]'))) {
+      if (el.dataset.goFilter) { $('#stock-filter').value = el.dataset.goFilter; renderStock(); }
+      useView(el.dataset.goView);
+    }
     if ((el = alvo('[data-open-modal]'))) {
       if (el.dataset.openModal === 'expense-modal') abrirCompra();
       else { if (el.dataset.openModal === 'item-modal') $('#item-class').dispatchEvent(new Event('change')); openModal(el.dataset.openModal); }
@@ -477,7 +493,35 @@
   $('#logout-button').addEventListener('click', () => sair('Você saiu da sua conta.'));
 
   $$('.modal-backdrop').forEach((m) => m.addEventListener('click', (e) => { if (e.target === m) closeModal(m); }));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $$('.modal-backdrop.open').forEach(closeModal); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') $$('.modal-backdrop.open').forEach(closeModal);
+    // Cartões clicáveis do painel também respondem ao teclado.
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.stat-link')) { e.preventDefault(); e.target.click(); }
+  });
+  window.addEventListener('popstate', () => { if (!$('#app').hidden) useView(location.hash.slice(1), { historico: false }); });
+
+  // ---------------------------------------------------------------- modo demonstração
+  const painelPreview = (abrir) => {
+    $('#preview-panel').hidden = !abrir;
+    $('#preview-toggle').setAttribute('aria-expanded', String(abrir));
+  };
+  $('#preview-user').addEventListener('change', async (e) => {
+    painelPreview(false);
+    sessao = window.CoChefPreview.entrarComo(e.target.value);
+    await carregar();
+    toast(`Agora você vê a casa como ${estado.eu.nome}.`);
+  });
+  $('#preview-toggle').addEventListener('click', () => painelPreview($('#preview-panel').hidden));
+  document.addEventListener('click', (e) => { if (!e.target.closest('#preview-bar')) painelPreview(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') painelPreview(false); });
+  $('#preview-reset').addEventListener('click', async () => {
+    painelPreview(false);
+    sessao = window.CoChefPreview.recomecar();
+    $('#stock-filter').value = 'TODOS';
+    $('#stock-search').value = '';
+    await carregar();
+    toast('Dados de exemplo restaurados.');
+  });
 
   // ---------------------------------------------------------------- acesso
   function trocarAba(aba) {
@@ -488,6 +532,7 @@
   }
 
   function mostrarAcesso(mensagem = '') {
+    $('#preview-hint').hidden = !modoPreview;
     $('#app').hidden = true;
     $('#auth-screen').hidden = false;
     $('#auth-error').textContent = mensagem;
@@ -499,7 +544,8 @@
       await carregar();
       $('#auth-screen').hidden = true;
       $('#app').hidden = false;
-      useView('dashboard');
+      $('#preview-bar').hidden = !modoPreview;
+      useView(location.hash.slice(1) || 'dashboard', { historico: false });
     } catch (e) {
       if (sessao) mostrarAcesso(e.message);
     }
@@ -541,6 +587,32 @@
     }
   });
 
-  if (sessao?.token) entrarNoApp();
-  else mostrarAcesso();
+  // A API existe? Com o servidor Python, /api responde JSON (mesmo sem login).
+  async function apiDisponivel() {
+    if (location.protocol === 'file:') return false;
+    try {
+      const r = await fetch('/api/eu', { headers: { Accept: 'application/json' } });
+      return (r.headers.get('content-type') || '').includes('json');
+    } catch {
+      return false;
+    }
+  }
+
+  async function iniciar() {
+    const pediuPreview = new URLSearchParams(location.search).has('preview');
+    if (pediuPreview || !(await apiDisponivel())) {
+      if (!window.CoChefPreview) { mostrarAcesso('Não foi possível falar com o servidor do CoChef.'); return; }
+      modoPreview = true;
+      document.body.classList.add('is-preview');
+      $('#footer-note').textContent = 'CoChef · Protótipo navegável · Dados fictícios guardados apenas nesta aba';
+      sessao = window.CoChefPreview.recomecar();
+      await entrarNoApp();
+      toast('Modo demonstração: explore à vontade, nada é salvo.');
+      return;
+    }
+    if (sessao?.token) entrarNoApp();
+    else mostrarAcesso();
+  }
+
+  iniciar();
 })();
