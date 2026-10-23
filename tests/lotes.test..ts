@@ -1,4 +1,7 @@
+
 /**
+ * FASE VERMELHA FEITA, RENOMEAR ARQUIVO
+ * 
  * FASE VERMELHA (TDD) — T-46: lotes por produto, cada um com sua validade (US-16; revisão A-02).
  *
  * Fora do `npm test` e do CI (o nome termina em .red.ts). Para rodar:
