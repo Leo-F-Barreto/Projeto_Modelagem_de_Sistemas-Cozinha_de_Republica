@@ -131,6 +131,8 @@ describe('Autenticação, perfis e isolamento', () => {
     const r = await fetch(`${app.base}/`);
     assert.equal(r.status, 200);
     assert.match(r.headers.get('content-security-policy')!, /default-src 'self'/);
+    assert.match(r.headers.get('content-security-policy')!, /script-src 'self'/);
+    assert.doesNotMatch(r.headers.get('content-security-policy')!, /script-src[^;]*unsafe-inline/);
     assert.equal(r.headers.get('x-content-type-options'), 'nosniff');
     assert.equal(r.headers.get('x-frame-options'), 'DENY');
     const fuga = await fetch(`${app.base}/..%2f..%2fpackage.json`);

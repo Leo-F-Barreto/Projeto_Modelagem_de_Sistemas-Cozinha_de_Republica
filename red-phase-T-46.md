@@ -93,7 +93,7 @@ $ npm run test:red
 ℹ fail 13
 ```
 
-A suíte oficial não foi afetada: `npm test` continua com **84 de 84 aprovados**, porque os arquivos `*.red.ts` ficam fora do padrão `tests/**/*.test.ts` usado pelo `npm test` e pelo CI.
+A suíte estável não é afetada pelos testes da fase vermelha: após este checkpoint, `npm test` passa com **90 de 90 aprovados**. O comando testa apenas arquivos `tests/*.test.ts`; o arquivo `tests/red/lotes.red.ts` fica deliberadamente separado até a implementação chegar à fase verde.
 
 ## 6. Cada teste falha pelo motivo certo
 
@@ -121,7 +121,7 @@ Os testes 7, 10, 12 e 13 têm valor duplo: além de especificar a funcionalidade
 3. **Domínio:** criar `src/dominio/lotes.ts` com `planejarConsumo` e `separarVencidos`, o que deve deixar os testes 1–5 verdes.
 4. **Banco:** criar a tabela `lote` (produto, quantidade, validade) e migrar cada produto existente para um lote único com a sua validade atual.
 5. **Serviços:** `cadastrarProduto` e `reporProduto` passam a gravar lotes; `consumirProduto` usa `planejarConsumo`; a rotina do notificador (`rotinas.ts`) vence lotes em vez de produtos; o DTO passa a expor `lotes`. Isso deve deixar os testes 6–13 verdes.
-6. **Regressão:** `npm test` precisa continuar com 84 de 84. Atenção ao teste "reposição de produto vencido substitui o lote e exige nova validade", que deve continuar valendo.
+6. **Regressão:** `npm test` precisa continuar com 90 de 90. Atenção ao teste "reposição de produto vencido substitui o lote e exige nova validade", que deve continuar valendo.
 7. **Promoção:** renomear `tests/red/lotes.red.ts` para `tests/lotes.test.ts` (que passa a entrar no `npm test` e no CI), atualizar a matriz de rastreabilidade e o `tasks.md`.
 
-Depois da fase verde vem a refatoração, com os 97 testes (84 + 13) como rede de segurança.
+Depois da fase verde vem a refatoração, com os 103 testes (90 + 13) como rede de segurança, ajustando a contagem se novos testes estáveis forem adicionados antes da promoção.

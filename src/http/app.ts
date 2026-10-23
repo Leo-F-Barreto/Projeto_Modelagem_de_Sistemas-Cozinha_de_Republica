@@ -18,8 +18,8 @@ const LIMITE_CORPO = 64 * 1024;
 const JANELA_AUTH_MS = 15 * 60 * 1000;
 
 const CABECALHOS_SEGURANCA: Record<string, string> = {
-  // Sem scripts nem estilos inline e sem origens externas: reduz muito o impacto de um eventual XSS.
-  'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
+  // Scripts só da própria origem; estilos inline são permitidos para classes/ajustes do protótipo.
+  'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'no-referrer',

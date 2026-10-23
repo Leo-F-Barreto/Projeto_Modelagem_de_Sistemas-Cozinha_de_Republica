@@ -55,3 +55,31 @@ Para garantir um desenvolvimento pragmático, testável e focado na entrega de v
 * Processamento e liquidação automática de pagamentos via chave PIX/gateway bancário dentro do aplicativo (no MVP, o acerto financeiro será registrado e verificado manualmente).
 * Integração com APIs de e-commerce de supermercados para compras online automatizadas.
 * Módulo de recomendação de receitas via Inteligência Artificial (a prioridade inicial é estritamente a gestão do domínio de estoque e finanças).
+
+---
+
+## Execução local e checkpoint
+
+### Requisitos
+
+- Node.js **22.6 ou superior** (usa o suporte experimental do Node para executar TypeScript sem etapa de compilação).
+- Não há dependências npm de terceiros obrigatórias no checkpoint atual.
+
+### Comandos
+
+```bash
+npm test             # suíte estável de testes automatizados
+npm run test:red     # testes TDD da funcionalidade de lotes ainda não implementada
+npm start            # API e protótipo web em http://localhost:3000
+```
+
+A configuração pode ser ajustada com variáveis de ambiente: `PORT` (porta HTTP), `COCHEF_DB` (arquivo SQLite), `COCHEF_JWT_SEGREDO` (segredo JWT com no mínimo 32 caracteres) e `COCHEF_FUSO` (fuso horário). O banco e o segredo local não devem ser versionados.
+
+### Protótipo HTML
+
+O protótipo está em `public/index.html`, com estilos em `public/styles.css` e interações em `public/app.js`, e é servido pela aplicação em `/`. Ele demonstra os módulos de visão geral, estoque, lista de compras, financeiro, escala e moradores. As interações usam dados fictícios e `localStorage` do navegador; elas **não** substituem a API, a autenticação real, nem pagamentos. Para restaurar os dados fictícios iniciais, remova a chave `cochef-demo-v1` do armazenamento local do navegador.
+
+### Estado conhecido dos testes
+
+- `npm test`: suíte estável; a evidência desta rodada está em `docs/review/checkpoint-2026-10-22.md`.
+- `npm run test:red`: espera falhar por enquanto. O grupo T-46 especifica consumo por lotes/FEFO, mas a regra e a integração com a API ainda precisam ser implementadas. Não confundir a fase vermelha de TDD com a suíte estável.
