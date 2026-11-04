@@ -1,0 +1,10 @@
+# Dependências de execução (espelham pyproject.toml). Instale com: python -m pip install -r requirements.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+alembic>=1.13
+pydantic>=2.7
+pydantic-settings>=2.3
+pyjwt>=2.8
+bcrypt>=4.1
+apscheduler>=3.10,<4
